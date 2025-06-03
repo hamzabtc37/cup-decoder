@@ -4,27 +4,89 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Decoding Game (Rabbit + Confetti + Floating Rabbits)</title>
-
-  <!-- ==============================================
-       IMPORT “Poppins” FROM GOOGLE FONTS
-       ============================================== -->
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
-
     /* ==============================================
        BODY + RABBIT‐TILED PINK BACKGROUND
        ============================================== */
     body {
       margin: 0;
       padding: 0;
-      font-family: 'Poppins', sans-serif; /* Cute, readable font */
-      background-color: #ffe6f0; /* Soft pastel-pink base */
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      /* Soft pastel‐pink base */
+      background-color: #ffe6f0;
+
+      /* Tile a small Rabbit emoji (72×72 px) from Twemoji behind everything */
       background-image: url('https://twemoji.maxcdn.com/v/latest/72x72/1f407.png');
       background-repeat: repeat;
       background-size: 72px 72px;
       background-position: center;
-      color: #4a2f4a; /* Deep plum text for contrast */
-      overflow-x: hidden; /* Prevent horizontal scrollbar if confetti appears */
+
+      color: #4a2f4a; /* deep plum text for good contrast */
+      overflow-x: hidden; /* prevent horizontal scrollbar if confetti flows */
+    }
+
+    /* ==============================================
+       FLOATING RABBIT ANIMATION
+       ============================================== */
+    .float-rabbit {
+      position: fixed;
+      bottom: -50px;          /* start just below the viewport */
+      font-size: 2rem;        /* size of the emoji */
+      opacity: 0;
+      animation-name: floatUp;
+      animation-duration: 6s;
+      animation-timing-function: ease-out;
+      animation-fill-mode: forwards;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateX(0) translateY(0) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      100% {
+        /* --dx is a random horizontal shift set in JS */
+        transform: translateX(calc(var(--dx) * 1px)) translateY(-120vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* ==============================================
+       CONFETTI PIECES
+       ============================================== */
+    #confetti-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 0;            /* confetti will “fall” through the viewport */
+      pointer-events: none; /* clicks pass through */
+      z-index: 9999;        /* above everything else */
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;  /* default, overridden in JS */
+      height: 10px; /* default, overridden in JS */
+      opacity: 0.9;
+      border-radius: 2px;
+      animation-name: fall;
+      animation-timing-function: linear;
+      animation-fill-mode: forwards;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
     }
 
     /* ==============================================
@@ -32,13 +94,13 @@
        ============================================== */
     .container {
       max-width: 600px;
-      margin: 3rem auto; /* Extra top margin so it never hides beneath mobile UI */
-      background: rgba(255, 255, 255, 0.92); /* Slightly translucent white */
+      margin: 2rem auto;
+      background: rgba(255, 255, 255, 0.88); /* slightly translucent white */
       border-radius: 16px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       padding: 2rem;
       text-align: center;
-      position: relative; /* For layering above confetti */
+      position: relative; /* for layering above confetti */
       z-index: 1;
     }
 
@@ -48,12 +110,10 @@
     h1 {
       font-size: 2.5rem;
       margin-bottom: 0.5rem;
-      color: #d63384; /* Bright fuchsia */
-      font-weight: 600;
+      color: #d63384; /* bright fuchsia */
     }
     p {
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
+      font-size: 1.1rem;
     }
     ol {
       text-align: left;
@@ -62,15 +122,15 @@
     }
     ol li {
       margin: 1rem 0;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
     }
     code {
       display: inline-block;
-      background: #fce4ec; /* Very pale pink */
+      background: #fce4ec; /* very pale pink */
       padding: 0.2em 0.4em;
       border-radius: 4px;
       font-family: monospace;
-      color: #a31515; /* Dark red */
+      color: #a31515; /* dark red */
     }
 
     /* ==============================================
@@ -78,25 +138,26 @@
        ============================================== */
     textarea {
       width: 100%;
-      height: 3.6em;
+      height: 3.2em;
       font-size: 1rem;
-      padding: 0.6em;
+      padding: 0.5em;
       border: 2px solid #d63384;
       border-radius: 8px;
       resize: vertical;
       box-sizing: border-box;
-      margin-top: 0.8rem;
+      margin-top: 0.5rem;
       font-family: inherit;
       color: #4a2f4a;
     }
     textarea::placeholder {
-      color: #a066a4; /* Lighter purple placeholder */
+      color: #a066a4; /* lighter purple placeholder */
     }
+
     button {
       margin-top: 1rem;
       padding: 0.6em 1.2em;
       font-size: 1rem;
-      background-color: #d63384; /* Fuchsia */
+      background-color: #d63384; /* fuchsia */
       color: white;
       border: none;
       border-radius: 8px;
@@ -104,6 +165,7 @@
       transition: background-color 0.2s ease, transform 0.2s ease;
       font-family: inherit;
     }
+    /* Button “bounce” on hover/active */
     button:hover {
       transform: scale(1.05);
     }
@@ -134,67 +196,7 @@
       font-size: 1.3rem;
       font-weight: bold;
       color: #4a2f4a;
-      min-height: 1.4em; /* Reserve space for the typewriter effect */
-    }
-
-    /* ==============================================
-       FLOATING RABBIT ANIMATION
-       ============================================== */
-    .float-rabbit {
-      position: fixed;
-      bottom: -50px;          /* Start just below viewport */
-      font-size: 2rem;        /* Size of the emoji */
-      opacity: 0;
-      animation-name: floatUp;
-      animation-duration: 6s;
-      animation-timing-function: ease-out;
-      animation-fill-mode: forwards;
-    }
-    @keyframes floatUp {
-      0% {
-        transform: translateX(0) translateY(0) rotate(0deg);
-        opacity: 0;
-      }
-      10% {
-        opacity: 1;
-      }
-      100% {
-        transform: translateX(calc(var(--dx) * 1px)) translateY(-120vh) rotate(360deg);
-        opacity: 0;
-      }
-    }
-
-    /* ==============================================
-       CONFETTI PIECES
-       ============================================== */
-    #confetti-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 0;            /* Confetti will “fall” through the viewport */
-      pointer-events: none; /* Clicks pass through */
-      z-index: 9999;        /* Above everything else */
-    }
-    .confetti {
-      position: absolute;
-      width: 10px;  /* Default, overridden in JS */
-      height: 10px; /* Default, overridden in JS */
-      opacity: 0.9;
-      border-radius: 2px;
-      animation-name: fall;
-      animation-timing-function: linear;
-      animation-fill-mode: forwards;
-    }
-    @keyframes fall {
-      0% {
-        transform: translateY(0) rotate(0deg);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(100vh) rotate(360deg);
-        opacity: 0;
-      }
+      min-height: 1.4em; /* reserve space for typewriter effect */
     }
 
     /* ==============================================
@@ -202,19 +204,18 @@
        ============================================== */
     @media (max-width: 480px) {
       .container {
-        margin: 2rem 0.5rem; /* Slightly smaller margins on very small screens */
+        margin: 1rem;
         padding: 1rem;
       }
       h1 {
         font-size: 2rem;
       }
       ol li {
-        font-size: 1.1rem;
+        font-size: 1rem;
       }
     }
   </style>
 </head>
-
 <body>
   <!-- Confetti container sits behind everything -->
   <div id="confetti-container"></div>
@@ -282,7 +283,7 @@
         conf.style.width = size + 'px';
         conf.style.height = size + 'px';
 
-        // Random horizontal start position (0vw – 100vw)
+        // Random horizontal start position (0% – 100% of viewport width)
         conf.style.left = Math.random() * 100 + 'vw';
 
         // Random background color from palette
@@ -291,24 +292,24 @@
         // Random animation duration between 3s and 5s
         conf.style.animationDuration = (Math.random() * 2 + 3) + 's';
 
-        // Staggered start so they don’t all fall at once
+        // Staggered start so they don’t all fall simultaneously
         conf.style.animationDelay = (Math.random() * 0.5) + 's';
 
         container.appendChild(conf);
 
-        // Remove each confetti piece after its animation ends
+        // Remove each confetti piece from DOM after its animation ends
         conf.addEventListener('animationend', () => conf.remove());
       }
     }
 
     /**
-     * Spawns a single “float-rabbit” emoji that drifts upward and fades out.
+     * When called, spawns a single “float-rabbit” emoji that drifts upward and fades out.
      */
     function spawnFloatingRabbit() {
       const rabbit = document.createElement('div');
       rabbit.classList.add('float-rabbit');
 
-      // Place at a random x-coordinate
+      // Place at a random x-coordinate (0px to window.innerWidth)
       const startX = Math.random() * window.innerWidth;
       rabbit.style.left = `${startX}px`;
 
@@ -326,28 +327,29 @@
       }, 6000);
     }
 
-    // Every 1.5 seconds, spawn 2 floating rabbits
-    setInterval(() => {
-      spawnFloatingRabbit();
-      spawnFloatingRabbit();
-    }, 1500);
+    // Every 4 seconds, spawn a floating rabbit
+    setInterval(spawnFloatingRabbit, 4000);
 
     /**
      * Main decode function: strips whitespace, attempts Base64 decode,
      * on success types out the plaintext + fires confetti; on error shakes & shows “Invalid Base64!”
      */
     function decodeBase64() {
+      // 1) Grab the user input and strip out all whitespace
       let txt = document.getElementById('input').value.trim();
-      txt = txt.replace(/\s+/g, ''); // Strip whitespace
+      txt = txt.replace(/\s+/g, '');
 
+      // 2) If empty, do nothing further
       if (txt.length === 0) {
         document.getElementById('output').textContent = '';
         return;
       }
 
+      // 3) Attempt to Base64-decode
       try {
         const decoded = atob(txt);
 
+        // 4) If decoded is nonempty, type it out and fire confetti
         if (decoded.length > 0) {
           typeWriter(decoded, 50);
           generateConfetti();
