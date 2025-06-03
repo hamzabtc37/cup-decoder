@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Decoding Game (Rabbit + Confetti Fix)</title>
+  <title>Decoding Game (Rabbit + Confetti Fix v2)</title>
   <style>
     /* ==============================================
        BODY + RABBIT‐TILED PINK BACKGROUND
@@ -21,7 +21,7 @@
       background-size: 72px 72px;
       background-position: center;
 
-      color: #4a2f4a; /* deep plum text */
+      color: #4a2f4a; /* deep plum text for good contrast */
       overflow-x: hidden; /* prevent horizontal scrollbar if confetti flows */
     }
 
@@ -33,15 +33,15 @@
       top: 0;
       left: 0;
       width: 100%;
-      height: 0;           /* confetti will “fall” down through the viewport */
-      pointer-events: none;/* clicks pass through */
-      z-index: 9999;       /* above everything else */
+      height: 0;            /* confetti will “fall” through the viewport */
+      pointer-events: none; /* clicks pass through */
+      z-index: 9999;        /* above everything else */
     }
 
     .confetti {
       position: absolute;
-      width: 10px;  /* default, but overridden in JS */
-      height: 10px; /* default, but overridden in JS */
+      width: 10px;  /* default, overridden in JS */
+      height: 10px; /* default, overridden in JS */
       opacity: 0.9;
       border-radius: 2px;
       animation-name: fall;
@@ -152,17 +152,17 @@
     #celebrate {
       font-size: 1.8rem;
       margin-top: 1rem;
-      color: #ff1493; /* hot pink */
-      opacity: 0;
+      color: #ff1493;   /* hot pink */
+      opacity: 0;       /* ensure it’s hidden by default in case CSS alone isn’t enough */
       animation-name: popIn;
       animation-duration: 0.6s;
       animation-fill-mode: forwards;
     }
 
     @keyframes popIn {
-      0% { transform: scale(0.3); opacity: 0; }
-      60% { transform: scale(1.2); opacity: 1; }
-      100% { transform: scale(1); opacity: 1; }
+      0%   { transform: scale(0.3); opacity: 0; }
+      60%  { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1);   opacity: 1; }
     }
 
     /* ==============================================
@@ -211,7 +211,7 @@
     <textarea id="input" placeholder="Paste the Base64 string here"></textarea><br />
     <button onclick="decodeBase64()">Decode</button>
 
-    <!-- Hidden celebration message, shown on successful decode -->
+    <!-- Hidden celebration message, shown **only** on successful decode -->
     <div id="celebrate">🎉 Congratulations! 🎉</div>
 
     <!-- This is where the decoded text appears -->
@@ -222,7 +222,7 @@
     // Generate a little burst of confetti pieces (colored squares)
     function generateConfetti() {
       const container = document.getElementById('confetti-container');
-      const colors = ['#FFC0CB', '#FF69B4', '#FF1493', '#FFB6C1', '#DB7093']; // pink/purple palette
+      const colors = ['#FFC0CB', '#FF69B4', '#FF1493', '#FFB6C1', '#DB7093'];
 
       for (let i = 0; i < 60; i++) {
         const conf = document.createElement('div');
@@ -242,7 +242,7 @@
         // Random animation duration between 3s and 5s
         conf.style.animationDuration = (Math.random() * 2 + 3) + 's';
 
-        // Staggered start so they don’t all fall at once
+        // Staggered start so they don’t all fall simultaneously
         conf.style.animationDelay = (Math.random() * 0.5) + 's';
 
         container.appendChild(conf);
@@ -253,35 +253,33 @@
     }
 
     function decodeBase64() {
+      // Step 0: Immediately hide “Congratulations” at the very start
+      const celebrateElem = document.getElementById('celebrate');
+      celebrateElem.style.opacity = '0';
+
+      // Step 1: Grab the user input and strip out all whitespace
       let txt = document.getElementById('input').value.trim();
-      // Strip out any whitespace (spaces, newlines, tabs)
       txt = txt.replace(/\s+/g, '');
 
-      // If the stripped string is empty, do nothing (no celebration, no decode)
+      // If the stripped string is empty, do nothing further
       if (txt.length === 0) {
         document.getElementById('output').textContent = '';
-        document.getElementById('celebrate').style.opacity = '0';
         return;
       }
 
+      // Step 2: Attempt to Base64‐decode
       try {
-        // Attempt to decode
         const decoded = atob(txt);
         document.getElementById('output').textContent = decoded;
 
-        // Only show celebration if decoded result is non-empty
+        // Only show celebration if the decoded result is non‐empty
         if (decoded.length > 0) {
-          const celebrateElem = document.getElementById('celebrate');
-          celebrateElem.style.opacity = '1'; // triggers the popIn animation
+          celebrateElem.style.opacity = '1'; // trigger popIn animation
           generateConfetti();
-        } else {
-          // If atob succeeded but returned an empty string, treat it like “not valid”
-          document.getElementById('celebrate').style.opacity = '0';
         }
       } catch {
-        // Decoding failed, so hide celebration and show error
+        // If decoding fails, show an error and keep celebration hidden
         document.getElementById('output').textContent = '❌ Invalid Base64!';
-        document.getElementById('celebrate').style.opacity = '0';
       }
     }
   </script>
