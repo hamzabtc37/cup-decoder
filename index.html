@@ -1,47 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Decoding Game (Happy Rabbits Version)</title>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Decoding Game (Rabbit Edition)</title>
   <style>
-    /* ---------- Page Background ---------- */
+    /* ==============================================
+       BODY + RABBIT‐TILED PINK BACKGROUND
+       ============================================== */
     body {
       margin: 0;
       padding: 0;
       font-family: 'Comic Sans MS', cursive, sans-serif;
-      background-color: #ffe6f0; /* Soft pastel pink behind the pattern */
+      /* Soft pastel‐pink base color: */
+      background-color: #ffe6f0;
 
-      /* Use a seamlessly tiling rabbit pattern from Pixabay */
-      background-image: url('https://cdn.pixabay.com/photo/2021/03/31/17/47/rabbit-cartoon-6136143_1280.jpg');
+      /* On top of that pink, tile a small Rabbit icon (72×72 px) from Twemoji: */
+      background-image: url('https://twemoji.maxcdn.com/v/latest/72x72/1f407.png');
       background-repeat: repeat;
-      background-size: 200px 200px; /* Adjust tile size as needed */
+      background-position: center;
+      /* Feel free to tweak the size, for instance:
+         background-size: 80px 80px; 
+         if you want each rabbit a little larger/smaller. */
+      background-size: 72px 72px;
 
-      color: #4a2f4a; /* Deep plum text for contrast */
+      color: #4a2f4a; /* deep plum text for good contrast */
     }
 
-    /* ---------- Centered “card” container ---------- */
+    /* ==============================================
+       CONTAINER (“CARD”) SETUP
+       ============================================== */
     .container {
       max-width: 600px;
       margin: 2rem auto;
-      background: rgba(255, 255, 255, 0.85); /* Semi-transparent white backdrop */
+      background: rgba(255, 255, 255, 0.88); /* slightly translucent white */
       border-radius: 16px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       padding: 2rem;
       text-align: center;
     }
 
-    /* ---------- Heading Styles ---------- */
+    /* ==============================================
+       HEADINGS & TEXT
+       ============================================== */
     h1 {
       font-size: 2.5rem;
       margin-bottom: 0.5rem;
-      color: #d63384; /* Bright fuchsia */
+      color: #d63384; /* bright fuchsia */
     }
-
-    /* ---------- Instruction List ---------- */
-    p { 
-      font-size: 1.1rem; 
+    p {
+      font-size: 1.1rem;
     }
     ol {
       text-align: left;
@@ -54,17 +62,19 @@
     }
     code {
       display: inline-block;
-      background: #fce4ec; /* Very pale pink */
+      background: #fce4ec; /* very pale pink */
       padding: 0.2em 0.4em;
       border-radius: 4px;
       font-family: monospace;
-      color: #a31515;
+      color: #a31515; /* dark red for emphasis */
     }
 
-    /* ---------- Textarea & Button ---------- */
+    /* ==============================================
+       TEXTAREA & BUTTON
+       ============================================== */
     textarea {
       width: 100%;
-      height: 3em;
+      height: 3.2em;
       font-size: 1rem;
       padding: 0.5em;
       border: 2px solid #d63384;
@@ -72,24 +82,32 @@
       resize: vertical;
       box-sizing: border-box;
       margin-top: 0.5rem;
+      font-family: inherit;
+      color: #4a2f4a;
+    }
+    textarea::placeholder {
+      color: #a066a4; /* lighter purple placeholder */
     }
 
     button {
       margin-top: 1rem;
       padding: 0.6em 1.2em;
       font-size: 1rem;
-      background-color: #d63384; /* Fuchsia */
+      background-color: #d63384; /* fuchsia */
       color: white;
       border: none;
       border-radius: 8px;
       cursor: pointer;
       transition: background-color 0.2s ease;
+      font-family: inherit;
     }
     button:hover {
-      background-color: #a12c68; /* Darker fuchsia on hover */
+      background-color: #a12c68; /* darker fuchsia on hover */
     }
 
-    /* ---------- Decoded Output ---------- */
+    /* ==============================================
+       DECODED OUTPUT
+       ============================================== */
     #output {
       margin-top: 1.5rem;
       font-size: 1.3rem;
@@ -97,7 +115,9 @@
       color: #4a2f4a;
     }
 
-    /* ---------- Responsive Adjustments ---------- */
+    /* ==============================================
+       RESPONSIVE ADJUSTMENTS
+       ============================================== */
     @media (max-width: 480px) {
       .container {
         margin: 1rem;
@@ -112,31 +132,41 @@
     }
   </style>
 </head>
-
 <body>
   <div class="container">
     <h1>🐰 Decoding Game 🐰</h1>
     <p>Follow these steps to reveal the hidden message:</p>
+
     <ol>
       <li>
-        <strong>Reassemble the groups:</strong><br>
-        Combine the 8 groups into one continuous string (no spaces).<br>
-        <code>UW5pbmEgd2lsbCBhbHdheXMgbG92ZSBMYmVsYXJhLg==</code>
+        <strong>Example of “initiator” for each group:</strong><br>
+        Write the first few letters of each group like this:<br>
+        <code>UW...</code>
+        <code>Eg...</code>
+        <code>b...</code>
+        <br /><br />
+        <strong>Here are the exact 8 groups printed on your cup:</strong><br />
+        <code>UW5pbm&nbsp;&nbsp;Egd2ls&nbsp;&nbsp;bCBhbH&nbsp;&nbsp;dheXMg&nbsp;&nbsp;bG9&nbsp;&nbsp;2ZSBMY&nbsp;&nbsp;mVsYXJ&nbsp;&nbsp;hLg==</code>
       </li>
+
       <li style="margin-top: 1em;">
-        <strong>Paste &amp; Decode:</strong><br>
-        Copy the full string above and paste it into the box below. Then click “Decode.”
+        <strong>Paste &amp; Decode:</strong><br />
+        Copy the full string above (including spaces) and paste it into the box below. Then click “Decode.”<br />
+        (Our script will automatically remove the spaces before Base64‐decoding.)
       </li>
     </ol>
 
-    <textarea id="input" placeholder="Paste the Base64 string here"></textarea><br>
+    <textarea id="input" placeholder="Paste the Base64 string here"></textarea><br />
     <button onclick="decodeBase64()">Decode</button>
     <div id="output"></div>
   </div>
 
   <script>
     function decodeBase64() {
-      const txt = document.getElementById('input').value.trim();
+      // Remove any spaces, then decode
+      let txt = document.getElementById('input').value.trim();
+      // Strip out spaces so atob() can work even if she pastes “UW5pbm Egd2ls ...”
+      txt = txt.replace(/\s+/g, '');
       try {
         const decoded = atob(txt);
         document.getElementById('output').textContent = decoded;
