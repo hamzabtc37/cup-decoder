@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Decoding Game (Rabbit + Confetti)</title>
+  <title>Decoding Game (Rabbit + Confetti Fix)</title>
   <style>
     /* ==============================================
        BODY + RABBIT‐TILED PINK BACKGROUND
@@ -15,7 +15,7 @@
       /* soft pastel‐pink base */
       background-color: #ffe6f0;
 
-      /* tile a small Rabbit emoji (72×72 px) from Twemoji */
+      /* tile a small Rabbit emoji (72×72 px) from Twemoji behind everything */
       background-image: url('https://twemoji.maxcdn.com/v/latest/72x72/1f407.png');
       background-repeat: repeat;
       background-size: 72px 72px;
@@ -196,14 +196,14 @@
     <ol>
       <li>
         <strong>Reassemble the words on the cup to get the correct message:</strong><br />
-        (They’re printed in random order, so arrange them so you end up with a single Base64 string.)<br /><br />
+        (They’re printed in random order—arrange them so you end up with a single Base64 string.)<br /><br />
         <strong>The “initiators” (first few letters of each group) are:</strong><br />
-        <code>U..... E.... b..... d..... b.. 2.... m.... h...</code>
+        <code>U.....  E....  b.....  d.....  b..  2....  m....  h...</code>
       </li>
 
       <li style="margin-top: 1em;">
         <strong>Now that you have the correct string, let’s decode it:</strong><br />
-        Copy the full Base64 string (with spaces) and paste it below. Then click “Decode.”<br />
+        Copy the full Base64 string (with spaces) and paste it below. Then click "Decode."<br />
         (The script will automatically strip out spaces before decoding.)
       </li>
     </ol>
@@ -254,21 +254,33 @@
 
     function decodeBase64() {
       let txt = document.getElementById('input').value.trim();
-      // Strip out any whitespace (spaces, newlines, etc.)
+      // Strip out any whitespace (spaces, newlines, tabs)
       txt = txt.replace(/\s+/g, '');
 
+      // If the stripped string is empty, do nothing (no celebration, no decode)
+      if (txt.length === 0) {
+        document.getElementById('output').textContent = '';
+        document.getElementById('celebrate').style.opacity = '0';
+        return;
+      }
+
       try {
-        const decoded = atob(txt); // decode
+        // Attempt to decode
+        const decoded = atob(txt);
         document.getElementById('output').textContent = decoded;
 
-        // Show celebration text and play pop-in animation
-        const celebrateElem = document.getElementById('celebrate');
-        celebrateElem.style.opacity = '1'; // triggers the popIn keyframe
-        // Generate confetti pieces
-        generateConfetti();
+        // Only show celebration if decoded result is non-empty
+        if (decoded.length > 0) {
+          const celebrateElem = document.getElementById('celebrate');
+          celebrateElem.style.opacity = '1'; // triggers the popIn animation
+          generateConfetti();
+        } else {
+          // If atob succeeded but returned an empty string, treat it like “not valid”
+          document.getElementById('celebrate').style.opacity = '0';
+        }
       } catch {
+        // Decoding failed, so hide celebration and show error
         document.getElementById('output').textContent = '❌ Invalid Base64!';
-        // Hide celebration if decode fails
         document.getElementById('celebrate').style.opacity = '0';
       }
     }
