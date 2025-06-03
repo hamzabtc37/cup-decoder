@@ -327,8 +327,11 @@
       }, 6000);
     }
 
-    // Every 4 seconds, spawn a floating rabbit
-    setInterval(spawnFloatingRabbit, 4000);
+    // Every 1.5 seconds, spawn 2 floating rabbits
+    setInterval(() => {
+      spawnFloatingRabbit();
+      spawnFloatingRabbit();
+    }, 1500);
 
     /**
      * Main decode function: strips whitespace, attempts Base64 decode,
