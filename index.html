@@ -3,26 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Decoding Game</title>
+  <title>Decoding Game (Happy Rabbits Version)</title>
+
   <style>
     /* ---------- Page Background ---------- */
     body {
       margin: 0;
       padding: 0;
       font-family: 'Comic Sans MS', cursive, sans-serif;
-      background-color: #ffe6f0; /* soft pastel pink behind the pattern */
-      background-image: url('https://i.imgur.com/2k9UU2X.png'); 
-      /* Example rabbit‐pattern image (hosted on Imgur). Replace with your own URL if desired. */
+      background-color: #ffe6f0; /* Soft pastel pink behind the pattern */
+
+      /* Use a seamlessly tiling rabbit pattern from Pixabay */
+      background-image: url('https://cdn.pixabay.com/photo/2021/03/31/17/47/rabbit-cartoon-6136143_1280.jpg');
       background-repeat: repeat;
-      background-size: 200px 200px; /* adjust for pattern scale */
-      color: #4a2f4a; /* deep plum text for contrast */
+      background-size: 200px 200px; /* Adjust tile size as needed */
+
+      color: #4a2f4a; /* Deep plum text for contrast */
     }
 
     /* ---------- Centered “card” container ---------- */
     .container {
       max-width: 600px;
       margin: 2rem auto;
-      background: rgba(255, 255, 255, 0.85); /* semi‐transparent white backdrop */
+      background: rgba(255, 255, 255, 0.85); /* Semi-transparent white backdrop */
       border-radius: 16px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       padding: 2rem;
@@ -33,10 +36,13 @@
     h1 {
       font-size: 2.5rem;
       margin-bottom: 0.5rem;
-      color: #d63384; /* bright fuchsia */
+      color: #d63384; /* Bright fuchsia */
     }
 
     /* ---------- Instruction List ---------- */
+    p { 
+      font-size: 1.1rem; 
+    }
     ol {
       text-align: left;
       margin: 1rem 0;
@@ -48,7 +54,7 @@
     }
     code {
       display: inline-block;
-      background: #fce4ec; /* very pale pink */
+      background: #fce4ec; /* Very pale pink */
       padding: 0.2em 0.4em;
       border-radius: 4px;
       font-family: monospace;
@@ -65,13 +71,14 @@
       border-radius: 8px;
       resize: vertical;
       box-sizing: border-box;
+      margin-top: 0.5rem;
     }
 
     button {
       margin-top: 1rem;
       padding: 0.6em 1.2em;
       font-size: 1rem;
-      background-color: #d63384; /* fuchsia */
+      background-color: #d63384; /* Fuchsia */
       color: white;
       border: none;
       border-radius: 8px;
@@ -79,7 +86,7 @@
       transition: background-color 0.2s ease;
     }
     button:hover {
-      background-color: #a12c68; /* darker fuchsia on hover */
+      background-color: #a12c68; /* Darker fuchsia on hover */
     }
 
     /* ---------- Decoded Output ---------- */
@@ -105,6 +112,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h1>🐰 Decoding Game 🐰</h1>
