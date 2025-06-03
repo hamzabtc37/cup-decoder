@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Decoding Game (Rabbit + Confetti)</title>
+  <title>Decoding Game (Rabbit + Confetti + Floating Rabbits)</title>
   <style>
     /* ==============================================
        BODY + RABBIT‐TILED PINK BACKGROUND
@@ -12,10 +12,10 @@
       margin: 0;
       padding: 0;
       font-family: 'Comic Sans MS', cursive, sans-serif;
-      /* soft pastel‐pink base */
+      /* Soft pastel‐pink base */
       background-color: #ffe6f0;
 
-      /* tile a small Rabbit emoji (72×72 px) from Twemoji behind everything */
+      /* Tile a small Rabbit emoji (72×72 px) from Twemoji behind everything */
       background-image: url('https://twemoji.maxcdn.com/v/latest/72x72/1f407.png');
       background-repeat: repeat;
       background-size: 72px 72px;
@@ -23,6 +23,35 @@
 
       color: #4a2f4a; /* deep plum text for good contrast */
       overflow-x: hidden; /* prevent horizontal scrollbar if confetti flows */
+    }
+
+    /* ==============================================
+       FLOATING RABBIT ANIMATION
+       ============================================== */
+    .float-rabbit {
+      position: fixed;
+      bottom: -50px;          /* start just below the viewport */
+      font-size: 2rem;        /* size of the emoji */
+      opacity: 0;
+      animation-name: floatUp;
+      animation-duration: 6s;
+      animation-timing-function: ease-out;
+      animation-fill-mode: forwards;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateX(0) translateY(0) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      100% {
+        /* --dx is a random horizontal shift set in JS */
+        transform: translateX(calc(var(--dx) * 1px)) translateY(-120vh) rotate(360deg);
+        opacity: 0;
+      }
     }
 
     /* ==============================================
@@ -133,11 +162,30 @@
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.2s ease;
+      transition: background-color 0.2s ease, transform 0.2s ease;
       font-family: inherit;
     }
+    /* Button “bounce” on hover/active */
     button:hover {
-      background-color: #a12c68; /* darker fuchsia on hover */
+      transform: scale(1.05);
+    }
+    button:active {
+      transform: scale(0.95);
+      transition: transform 0.1s ease-out;
+    }
+
+    /* ==============================================
+       SHAKE ON ERROR
+       ============================================== */
+    @keyframes shake {
+      0%   { transform: translateX(0); }
+      25%  { transform: translateX(-8px); }
+      50%  { transform: translateX(8px); }
+      75%  { transform: translateX(-8px); }
+      100% { transform: translateX(0); }
+    }
+    .shake {
+      animation: shake 0.4s ease-out;
     }
 
     /* ==============================================
@@ -148,6 +196,7 @@
       font-size: 1.3rem;
       font-weight: bold;
       color: #4a2f4a;
+      min-height: 1.4em; /* reserve space for typewriter effect */
     }
 
     /* ==============================================
@@ -185,20 +234,42 @@
 
       <li style="margin-top: 1em;">
         <strong>Now that you have the correct string, let’s decode it:</strong><br />
-        Copy the full Base64 string (with spaces) and paste it below. Then click "Decode."<br />
+        Copy the full Base64 string (with spaces) and paste it below. Then click “Decode.”<br />
         (The script will automatically strip out spaces before decoding.)
       </li>
     </ol>
 
     <textarea id="input" placeholder="Paste the Base64 string here"></textarea><br />
-    <button onclick="decodeBase64()">Decode</button>
+    <button id="decode-btn">Decode</button>
 
-    <!-- This is where the decoded text appears -->
+    <!-- Where the decoded text (typewriter) appears -->
     <div id="output"></div>
   </div>
 
   <script>
-    // Generate a little burst of confetti pieces (colored squares)
+    /**
+     * Typewriter: types a given text into #output, one character at a time.
+     * @param {string} text – The full decoded message.
+     * @param {number} speed – Milliseconds per character (default 50ms).
+     */
+    function typeWriter(text, speed = 50) {
+      const outputElem = document.getElementById('output');
+      outputElem.textContent = ''; // clear any old text
+      let index = 0;
+
+      function typeChar() {
+        if (index < text.length) {
+          outputElem.textContent += text.charAt(index);
+          index++;
+          setTimeout(typeChar, speed);
+        }
+      }
+      typeChar();
+    }
+
+    /**
+     * Generates a burst of confetti pieces (small colored squares) that fall and fade.
+     */
     function generateConfetti() {
       const container = document.getElementById('confetti-container');
       const colors = ['#FFC0CB', '#FF69B4', '#FF1493', '#FFB6C1', '#DB7093'];
@@ -231,31 +302,72 @@
       }
     }
 
+    /**
+     * When called, spawns a single “float-rabbit” emoji that drifts upward and fades out.
+     */
+    function spawnFloatingRabbit() {
+      const rabbit = document.createElement('div');
+      rabbit.classList.add('float-rabbit');
+
+      // Place at a random x-coordinate (0px to window.innerWidth)
+      const startX = Math.random() * window.innerWidth;
+      rabbit.style.left = `${startX}px`;
+
+      // Choose a random horizontal drift between -100px and +100px
+      const dx = (Math.random() * 200) - 100;
+      rabbit.style.setProperty('--dx', dx);
+
+      // Use the bunny emoji itself
+      rabbit.textContent = '🐰';
+      document.body.appendChild(rabbit);
+
+      // Remove after 6 seconds (length of the animation)
+      setTimeout(() => {
+        rabbit.remove();
+      }, 6000);
+    }
+
+    // Every 4 seconds, spawn a floating rabbit
+    setInterval(spawnFloatingRabbit, 4000);
+
+    /**
+     * Main decode function: strips whitespace, attempts Base64 decode,
+     * on success types out the plaintext + fires confetti; on error shakes & shows “Invalid Base64!”
+     */
     function decodeBase64() {
-      // Step 1: Grab the user input and strip out all whitespace
+      // 1) Grab the user input and strip out all whitespace
       let txt = document.getElementById('input').value.trim();
       txt = txt.replace(/\s+/g, '');
 
-      // If the stripped string is empty, do nothing further
+      // 2) If empty, do nothing further
       if (txt.length === 0) {
         document.getElementById('output').textContent = '';
         return;
       }
 
-      // Step 2: Attempt to Base64‐decode
+      // 3) Attempt to Base64-decode
       try {
         const decoded = atob(txt);
-        document.getElementById('output').textContent = decoded;
 
-        // Only fire confetti if decoded result is nonempty
+        // 4) If decoded is nonempty, type it out and fire confetti
         if (decoded.length > 0) {
+          typeWriter(decoded, 50);
           generateConfetti();
+        } else {
+          // Edge case: atob("") yields "" without error; treat as no output
+          document.getElementById('output').textContent = '';
         }
       } catch {
-        // If decoding fails, show an error (no confetti)
+        // Decoding failed: shake the textarea & show error
         document.getElementById('output').textContent = '❌ Invalid Base64!';
+        const ta = document.getElementById('input');
+        ta.classList.add('shake');
+        setTimeout(() => ta.classList.remove('shake'), 400);
       }
     }
+
+    // Wire up the Decode button
+    document.getElementById('decode-btn').addEventListener('click', decodeBase64);
   </script>
 </body>
 </html>
