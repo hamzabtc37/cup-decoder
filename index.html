@@ -3,32 +3,128 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Decode Your Message</title>
+  <title>Decoding Game</title>
   <style>
-    body { font-family: sans-serif; margin: 2rem; }
-    code { background: #f4f4f4; padding: 0.2em 0.4em; display: inline-block; }
-    textarea { width: 100%; height: 3em; font-size: 1rem; margin-top: 0.5em; }
-    button { margin-top: 0.5em; padding: 0.5em 1em; font-size: 1rem; }
-    #output { margin-top: 1rem; font-weight: bold; }
+    /* ---------- Page Background ---------- */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background-color: #ffe6f0; /* soft pastel pink behind the pattern */
+      background-image: url('https://i.imgur.com/2k9UU2X.png'); 
+      /* Example rabbit‐pattern image (hosted on Imgur). Replace with your own URL if desired. */
+      background-repeat: repeat;
+      background-size: 200px 200px; /* adjust for pattern scale */
+      color: #4a2f4a; /* deep plum text for contrast */
+    }
+
+    /* ---------- Centered “card” container ---------- */
+    .container {
+      max-width: 600px;
+      margin: 2rem auto;
+      background: rgba(255, 255, 255, 0.85); /* semi‐transparent white backdrop */
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---------- Heading Styles ---------- */
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      color: #d63384; /* bright fuchsia */
+    }
+
+    /* ---------- Instruction List ---------- */
+    ol {
+      text-align: left;
+      margin: 1rem 0;
+      padding-left: 1.2rem;
+    }
+    ol li {
+      margin: 1rem 0;
+      font-size: 1.1rem;
+    }
+    code {
+      display: inline-block;
+      background: #fce4ec; /* very pale pink */
+      padding: 0.2em 0.4em;
+      border-radius: 4px;
+      font-family: monospace;
+      color: #a31515;
+    }
+
+    /* ---------- Textarea & Button ---------- */
+    textarea {
+      width: 100%;
+      height: 3em;
+      font-size: 1rem;
+      padding: 0.5em;
+      border: 2px solid #d63384;
+      border-radius: 8px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 1rem;
+      padding: 0.6em 1.2em;
+      font-size: 1rem;
+      background-color: #d63384; /* fuchsia */
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    button:hover {
+      background-color: #a12c68; /* darker fuchsia on hover */
+    }
+
+    /* ---------- Decoded Output ---------- */
+    #output {
+      margin-top: 1.5rem;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #4a2f4a;
+    }
+
+    /* ---------- Responsive Adjustments ---------- */
+    @media (max-width: 480px) {
+      .container {
+        margin: 1rem;
+        padding: 1rem;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      ol li {
+        font-size: 1rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>Decoding Game</h1>
-  <p>Follow these steps to reveal the hidden message:</p>
-  <ol>
-    <li>
-      <strong>Reassemble the groups:</strong><br>
-      Combine the 8 groups into one continuous string (no spaces).<br>
-      <code>UW5pbmEgd2lsbCBhbHdheXMgbG92ZSBMYmVsYXJhLg==</code>
-    </li>
-    <li style="margin-top: 1em;">
-      <strong>Paste &amp; Decode:</strong><br>
-      Copy the full string above and paste it into the box below. Then click “Decode.”
-    </li>
-  </ol>
-  <textarea id="input" placeholder="Paste the Base64 string here"></textarea><br>
-  <button onclick="decodeBase64()">Decode</button>
-  <div id="output"></div>
+  <div class="container">
+    <h1>🐰 Decoding Game 🐰</h1>
+    <p>Follow these steps to reveal the hidden message:</p>
+    <ol>
+      <li>
+        <strong>Reassemble the groups:</strong><br>
+        Combine the 8 groups into one continuous string (no spaces).<br>
+        <code>UW5pbmEgd2lsbCBhbHdheXMgbG92ZSBMYmVsYXJhLg==</code>
+      </li>
+      <li style="margin-top: 1em;">
+        <strong>Paste &amp; Decode:</strong><br>
+        Copy the full string above and paste it into the box below. Then click “Decode.”
+      </li>
+    </ol>
+
+    <textarea id="input" placeholder="Paste the Base64 string here"></textarea><br>
+    <button onclick="decodeBase64()">Decode</button>
+    <div id="output"></div>
+  </div>
 
   <script>
     function decodeBase64() {
@@ -37,7 +133,7 @@
         const decoded = atob(txt);
         document.getElementById('output').textContent = decoded;
       } catch {
-        document.getElementById('output').textContent = 'Invalid Base64!';
+        document.getElementById('output').textContent = '❌ Invalid Base64!';
       }
     }
   </script>
