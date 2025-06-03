@@ -12,23 +12,20 @@
       margin: 0;
       padding: 0;
       font-family: 'Comic Sans MS', cursive, sans-serif;
-      /* Soft pastel‐pink base color: */
+      /* Soft pastel‐pink base color */
       background-color: #ffe6f0;
 
-      /* On top of that pink, tile a small Rabbit icon (72×72 px) from Twemoji: */
+      /* Tile a small Rabbit emoji (72×72 px) from Twemoji behind everything */
       background-image: url('https://twemoji.maxcdn.com/v/latest/72x72/1f407.png');
       background-repeat: repeat;
-      background-position: center;
-      /* Feel free to tweak the size, for instance:
-         background-size: 80px 80px; 
-         if you want each rabbit a little larger/smaller. */
       background-size: 72px 72px;
+      background-position: center;
 
       color: #4a2f4a; /* deep plum text for good contrast */
     }
 
     /* ==============================================
-       CONTAINER (“CARD”) SETUP
+       CENTERED CARD (“CONTAINER”) STYLING
        ============================================== */
     .container {
       max-width: 600px;
@@ -139,20 +136,17 @@
 
     <ol>
       <li>
-        <strong>Example of “initiator” for each group:</strong><br>
-        Write the first few letters of each group like this:<br>
-        <code>UW...</code>
-        <code>Eg...</code>
-        <code>b...</code>
+        <strong>Reassemble the words on the cup to get the correct message:</strong><br />
+        (They’re printed in random order, so arrange them so you end up with a single Base64 string.)
         <br /><br />
-        <strong>Here are the exact 8 groups printed on your cup:</strong><br />
-        <code>UW5pbm&nbsp;&nbsp;Egd2ls&nbsp;&nbsp;bCBhbH&nbsp;&nbsp;dheXMg&nbsp;&nbsp;bG9&nbsp;&nbsp;2ZSBMY&nbsp;&nbsp;mVsYXJ&nbsp;&nbsp;hLg==</code>
+        <strong>Here are the “initiators” (first few letters of each group):</strong><br />
+        <code>U..... E.... b..... d..... b.. 2.... m.... h...</code>
       </li>
 
       <li style="margin-top: 1em;">
-        <strong>Paste &amp; Decode:</strong><br />
-        Copy the full string above (including spaces) and paste it into the box below. Then click “Decode.”<br />
-        (Our script will automatically remove the spaces before Base64‐decoding.)
+        <strong>Now that you have the correct string, let’s decode it:</strong><br />
+        Copy the full Base64 string (with spaces) and paste it below. Then click “Decode.”<br />
+        (The script will automatically strip out spaces before decoding.)
       </li>
     </ol>
 
@@ -163,9 +157,8 @@
 
   <script>
     function decodeBase64() {
-      // Remove any spaces, then decode
       let txt = document.getElementById('input').value.trim();
-      // Strip out spaces so atob() can work even if she pastes “UW5pbm Egd2ls ...”
+      // Remove all whitespace so atob() accepts it
       txt = txt.replace(/\s+/g, '');
       try {
         const decoded = atob(txt);
